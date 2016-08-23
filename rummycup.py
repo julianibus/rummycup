@@ -1,6 +1,4 @@
 from random import randint
-#There are 13*4 + 2 stones.
-#
 
 
 class stone:
@@ -26,8 +24,11 @@ numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13]
 jstone = stone("r",1)
 jstone.joker = True
 allstones = list()
+allstones.append(jstone)
+allstones.append(jstone)
 for i in range(0, len(colors) -1):
     for j in range(0, len(numbers) -1):
+        allstones.append(stone(colors[i],numbers[j]))
         allstones.append(stone(colors[i],numbers[j]))
 
 
@@ -237,7 +238,7 @@ class board:
     def take(self, stone):
         self.stones.remove(stone)
         
-    def validate(self):
+    def validate(self, iterations):
         #cgroups = [None] * 10000
         solution = list()
         workbench = board()
@@ -246,7 +247,7 @@ class board:
         #print (len(workbench[0]))
         #solution[0] = group(self.stones[0])
        # groupnr = 0
-        iteration = 1000000
+        iteration = iterations
         while iteration > 0:
             iteration = iteration - 1
             #print ('\r' + "Iterations left: ", iteration)
@@ -294,8 +295,6 @@ class board:
                 for i in range(0, len(workbench.stones)):
                     if workbench.stones[i] in npos:
                         ncans.append(workbench.stones[i])
-                #print ("PRINT NCANS")
-                #printstonearray(ncans)
 
                 if len(ncans) == 0:
                     posleft = False
@@ -303,51 +302,60 @@ class board:
                     posleft = True
                     cgroup = ngroup
                     ccans = ncans
-                    #cgroups[groupnr] = cgroup
 
             if len(cgroup.stones) > 2:
                 solution.append(cgroup)
-                #print("------- added -------")
 
             else:
-                #print("------- reset -------")
-                #cgroups = [None] * 10000
                 solution = list()
                 workbench = board()
                 workbench.stones = list(workbench0stones)
-                #print("------- /reset -------")
 
             if len(workbench.stones) < len(self.residuum):
-                #print (len(workbench.stones),len(self.residuum))
                 self.solution = list(solution)
                 self.residuum = list(workbench.stones)
 
             if len(workbench.stones) == 0:
-                #print ("SOLUTION FOUND")
                 self.solution = solution
                 self.residuum = list()
                 return 0
         
         return len(workbench.stones)
-            
-def maketurn(handn, board):
-     dummy = 0
-                
-            
-                
-        
-        
-        
-        
 
-b = board()	
-b.read("board.txt")
-hand = board()	
-#hand.read("hand.txt")
-print ("SOL")
-print (b.validate())
-b.solutiontostr()
-print ("RES")
-print (str(len(b.residuum)))
-printstonearray(b.residuum)
+class player:
+    def __init__(self, name):
+        self.name = name
+        self.thinking = 10000
+        self.hand = board()
+        self.firstmove = True
+
+class game:
+    def __init__(self, players, board):
+        self.players = players
+        self.board = board
+        self.bank = list(allstones)
+        self.makesturn = 0
+
+    def printouthands(self):
+        for player in self.players:
+            print(player.name)
+            printstonearray(player.hand.stones)
+    def printoutboard(self):
+        printstonearray(self.board.stones)
+
+    def dealout(self, amount):
+        print (len(self.bank))
+        for player in self.players:
+            for i in range(0, amount):
+                index = randint(0, len(self.bank) - 1)
+                stone = self.bank[index]
+                self.bank.remove(stone)
+                player.hand.stones.append(stone)
+
+    def maketurn(playerindex):
+        dummy = 0
+    
+        
+        
+        
 
