@@ -13,11 +13,20 @@ class stone:
         else:
             return "j"
     def __eq__(self, other):
-
+##        if self.joker == False and other.joker == True:
+##            return False
+##        if self.joker == True and other.joker == False:
+##            return True
+##        if self.joker == True and other.joker == True:
+##            return True
+##        if self.joker == False and other.joker == False:        
         if other.color == self.color and other.value == self.value:
             return True
         else:
             return False
+        
+    def points(self):
+        self.value
 
 colors = ["r","b","g","s"]
 numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13]
@@ -26,8 +35,8 @@ jstone.joker = True
 allstones = list()
 allstones.append(jstone)
 allstones.append(jstone)
-for i in range(0, len(colors) -1):
-    for j in range(0, len(numbers) -1):
+for i in range(0, len(colors)):
+    for j in range(0, len(numbers)):
         allstones.append(stone(colors[i],numbers[j]))
         allstones.append(stone(colors[i],numbers[j]))
 
@@ -45,6 +54,14 @@ class group:
         for i in range(0, len(self.stones)):
             stri +=(self.stones[i].tostr()) + " "
         return stri
+
+    def points(self):
+        sum = 0
+        for i in range(0, len(self.stones)):
+            if self.stones[i].joker == False:
+                sum += self.stones[i].value
+
+        return sum
 
     def canadd(self, stone):
         #self.stone.append(stone)
@@ -203,7 +220,13 @@ class board:
     def solutiontostr(self):
         for sol in self.solution:
             print (sol.tostr())
+            
+    def points(self):
+        sum = 0
+        for i in range(0, len(self.solution)):
+            sum += self.solution[i].points()
 
+        return sum
     
     def add(self,stone):
         if isinstance(stone, list):
@@ -239,6 +262,7 @@ class board:
         self.stones.remove(stone)
         
     def validate(self, iterations):
+        sstones = list(self.stones)
         #cgroups = [None] * 10000
         solution = list()
         workbench = board()
@@ -283,6 +307,7 @@ class board:
                     ncan = ccans[randint(0, len(ccans) - 1)]
                 
                 ngroup.add(ncan)
+
                 #print ("ngroup: ", ngroup.tostr())
                 workbench.take(ncan)
                 #print ("WORKBENCH")
@@ -302,8 +327,9 @@ class board:
                     posleft = True
                     cgroup = ngroup
                     ccans = ncans
-
-            if len(cgroup.stones) > 2:
+                #print (cgroup.tostr(),cgroup.isvalid())
+            if ((len(cgroup.stones) > 2)and ngroup.isvalid()):
+               # print ("******************")
                 solution.append(cgroup)
 
             else:
@@ -319,7 +345,7 @@ class board:
                 self.solution = solution
                 self.residuum = list()
                 return 0
-        
+        self.stones = list(sstones)
         return len(workbench.stones)
 
 class player:
@@ -327,13 +353,14 @@ class player:
         self.name = name
         self.thinking = 10000
         self.hand = board()
-        self.firstmove = True
+        self.phaseone = True
 
 class game:
     def __init__(self, players, board):
         self.players = players
         self.board = board
         self.bank = list(allstones)
+        print (len(self.bank), " stones in total.")
         self.makesturn = 0
 
     def printouthands(self):
@@ -344,7 +371,6 @@ class game:
         printstonearray(self.board.stones)
 
     def dealout(self, amount):
-        print (len(self.bank))
         for player in self.players:
             for i in range(0, amount):
                 index = randint(0, len(self.bank) - 1)
@@ -352,8 +378,42 @@ class game:
                 self.bank.remove(stone)
                 player.hand.stones.append(stone)
 
-    def maketurn(playerindex):
-        dummy = 0
+    def maketurn(self,playerindex):
+        player = self.players[playerindex]
+        print (">>> Turn of ", player.name)
+        #printstonearray(player.hand.stones)
+        player.hand.validate(player.thinking)
+       # printstonearray(player.hand.stones)
+        print(len(player.hand.solution))
+        print("Groups discovered")
+        player.hand.solutiontostr()
+        print("Points: ", int(player.hand.points()))
+
+        if player.phaseone == True:
+            if (player.hand.points() >= 30):
+
+                
+                for g in player.hand.solution:
+                    sstones = g.stones
+                    for i in range(0, len(sstones)):
+                        sstone = sstones[i]
+                        self.board.stones.append(sstone)
+                        player.hand.stones.remove(sstone)
+
+                
+                        
+
+            else:
+                index = randint(0, len(self.bank) - 1)
+                draw = self.bank[index]
+                self.bank.remove(draw)
+                player.hand.stones.append(draw)
+        #else:
+            
+        
+        
+            
+            
     
         
         
