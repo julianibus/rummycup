@@ -12,6 +12,11 @@ class stone:
             return (self.color + str(self.value))
         else:
             return "j"
+    def __hash__(self):
+        if self.joker == False:
+            return hash(self.value)*hash(self.color)
+        else:
+            return 666
     def __eq__(self, other):
 ##        if self.joker == False and other.joker == True:
 ##            return False
@@ -108,7 +113,7 @@ class group:
 
                 if len(values) != len(set(values)):
                     return False
-                if (max(values) - min(values)) != (len(values) - 1 + njokers):
+                if (max(values) - min(values)) > (len(set(values)) - 1 + njokers):
                     return False
             else:
                 return False
@@ -212,6 +217,7 @@ class board:
     def __init__(self):
         self.stones = list()
         self.solution = list()
+        self.semisolution = list()
         self.residuum = [None] * 100
         
     def fill(self,stones):
@@ -225,6 +231,16 @@ class board:
         sum = 0
         for i in range(0, len(self.solution)):
             sum += self.solution[i].points()
+
+        return sum
+    def semisolutiontostr(self):
+        for sol in self.semisolution:
+            print (sol.tostr())
+            
+    def semipoints(self):
+        sum = 0
+        for i in range(0, len(self.semisolution)):
+            sum += self.semisolution[i].points()
 
         return sum
     
@@ -262,7 +278,12 @@ class board:
         self.stones.remove(stone)
         
     def validate(self, iterations):
+        if len(self.stones) == 0:
+            return 0
+
+        
         sstones = list(self.stones)
+        #print("sstones",len(sstones))
         #cgroups = [None] * 10000
         solution = list()
         workbench = board()
@@ -273,6 +294,7 @@ class board:
        # groupnr = 0
         iteration = iterations
         while iteration > 0:
+            
             iteration = iteration - 1
             #print ('\r' + "Iterations left: ", iteration)
             
@@ -339,13 +361,18 @@ class board:
 
             if len(workbench.stones) < len(self.residuum):
                 self.solution = list(solution)
+                self.semisolution = list(solution)
                 self.residuum = list(workbench.stones)
 
             if len(workbench.stones) == 0:
                 self.solution = solution
+                self.semisolution = list(solution)
                 self.residuum = list()
+                self.stones = list(sstones)
                 return 0
         self.stones = list(sstones)
+        print ("SEMISOLUTOn", len(self.semisolution))
+        #self.residuum = list()        
         return len(workbench.stones)
 
 class player:
@@ -382,36 +409,79 @@ class game:
         player = self.players[playerindex]
         print (">>> Turn of ", player.name)
         #printstonearray(player.hand.stones)
+       # print ("hand ende")
+        print ("BEFORE H VALI 1", len(player.hand.stones))
         player.hand.validate(player.thinking)
+        print ("AFTER H VALI 1", len(player.hand.stones))
        # printstonearray(player.hand.stones)
-        print(len(player.hand.solution))
+       # print(len(player.hand.solution))
         print("Groups discovered")
-        player.hand.solutiontostr()
+        print(player.hand.semisolutiontostr())
         print("Points: ", int(player.hand.points()))
-
+        print("VALI", self.board.validate(player.thinking))
+        print("VALI H", player.hand.validate(player.thinking))
+        stonesput = 0
+        
         if player.phaseone == True:
             if (player.hand.points() >= 30):
-
-                
+                player.phaseone = False
                 for g in player.hand.solution:
                     sstones = g.stones
                     for i in range(0, len(sstones)):
                         sstone = sstones[i]
                         self.board.stones.append(sstone)
+                        #print(len(self.board.stones))
                         player.hand.stones.remove(sstone)
-
-                
-                        
-
+                        stonesput += 1
+                print("VALI", self.board.validate(player.thinking))
+                print("VALI H", player.hand.validate(player.thinking))
             else:
                 index = randint(0, len(self.bank) - 1)
                 draw = self.bank[index]
                 self.bank.remove(draw)
                 player.hand.stones.append(draw)
-        #else:
-            
+                #print(len(self.board.stones))
+#SEMISOLUTION CONCEPT PROBABLY OBSOLETE
+        print ("BEFORE ERROR")
+        player.hand.solutiontostr()
+        if player.phaseone == False:
+            for g in player.hand.solution:
+                sstones = g.stones
+                for i in range(0, len(sstones)):
+                    sstone = sstones[i]
+                    self.board.stones.append(sstone)
+                    #print(len(self.board.stones))
+                    printstonearray(player.hand.stones)
+                    print(sstone.tostr())
+                    player.hand.stones.remove(sstone)
+                    stonesput += 1
+            #recalculate board
+            #self.board.validate()
+            print("VALI", self.board.validate(player.thinking))
+            print("VALI H", player.hand.validate(player.thinking))
+            for g in self.board.solution:
+                spos = g.getpossibilities()
+                cans = list(set(spos) & set(player.hand.stones))
+                ngroup = g
+                for scan in cans:
+                    ngroup.add(scan)
+                    if ngroup.isvalid():
+                        player.hand.stones.remove(scan)
+                        self.board.stones.append(scan)
+                        stonesput += 1
+                        #print(len(self.board.stones))
+                    else:
+                        ngroup.stones.remove(scan)
+                        continue     
+
+            if stonesput == 0: #draw when stuck
+                index = randint(0, len(self.bank) - 1)
+                draw = self.bank[index]
+                self.bank.remove(draw)
+                player.hand.stones.append(draw)
         
-        
+        #print(len(self.board.stones))     
+        print("VALI", self.board.validate(player.thinking))          
             
             
     

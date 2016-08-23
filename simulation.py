@@ -20,6 +20,9 @@ g = game([p1,p2,p3],b)
 g.printoutboard()
 g.dealout(14)
 g.printouthands()
-g.maketurn(0)
-g.printoutboard()
-g.printouthands()
+for i in range(0,15):
+    g.maketurn(0)
+    g.printoutboard()
+    g.printouthands()
+    print("")
+
