@@ -278,10 +278,11 @@ class board:
         self.stones.remove(stone)
         
     def validate(self, iterations):
+        print ("validation---------")
         if len(self.stones) == 0:
             return 0
 
-        
+        printstonearray(self.stones)
         sstones = list(self.stones)
         #print("sstones",len(sstones))
         #cgroups = [None] * 10000
@@ -368,10 +369,9 @@ class board:
                 self.solution = solution
                 self.semisolution = list(solution)
                 self.residuum = list()
-                self.stones = list(sstones)
+                self.stones = list(self.stones)
                 return 0
         self.stones = list(sstones)
-        print ("SEMISOLUTOn", len(self.semisolution))
         #self.residuum = list()        
         return len(workbench.stones)
 
@@ -424,17 +424,24 @@ class game:
         
         if player.phaseone == True:
             if (player.hand.points() >= 30):
+                print ("KOMME JETZT RAUS")
                 player.phaseone = False
                 for g in player.hand.solution:
-                    sstones = g.stones
-                    for i in range(0, len(sstones)):
-                        sstone = sstones[i]
-                        self.board.stones.append(sstone)
-                        #print(len(self.board.stones))
-                        player.hand.stones.remove(sstone)
+                    ssgtones = g.stones
+                    for i in range(0, len(ssgtones)):
+                        ssgtone = ssgtones[i]
+                        self.board.stones.append(ssgtone)
+                        #print(len(player.hand.stones))
+                        #printstonearray(player.hand.stones)
+                        player.hand.stones.remove(ssgtone)
                         stonesput += 1
-                print("VALI", self.board.validate(player.thinking))
-                print("VALI H", player.hand.validate(player.thinking))
+                #print("VALI", self.board.validate(player.thinking))
+                player.hand.validate(player.thinking)
+                
+               # print("AFTER VALIDATE")
+                #print(len(player.hand.stones))
+                #printstonearray(player.hand.stones)
+                player.hand.solutiontostr()
             else:
                 index = randint(0, len(self.bank) - 1)
                 draw = self.bank[index]
@@ -446,14 +453,14 @@ class game:
         player.hand.solutiontostr()
         if player.phaseone == False:
             for g in player.hand.solution:
-                sstones = g.stones
-                for i in range(0, len(sstones)):
-                    sstone = sstones[i]
-                    self.board.stones.append(sstone)
-                    #print(len(self.board.stones))
+                ssgtones = g.stones
+                for i in range(0, len(ssgtones)):
+                    ssgtone = ssgtones[i]
+                    self.board.stones.append(ssgtone)
+                    print(len(self.board.stones))
                     printstonearray(player.hand.stones)
-                    print(sstone.tostr())
-                    player.hand.stones.remove(sstone)
+                    print(ssgtone.tostr())
+                    player.hand.stones.remove(ssgtone)
                     stonesput += 1
             #recalculate board
             #self.board.validate()
