@@ -498,9 +498,51 @@ class game:
                         ngroup.stones.remove(scan)
                         continue
 
-            #SMART
-            for g in range(0,len(player.hand.solution)):
-                ssgtones = player.hand.solution[g].stones
+            #SMART I (systematically)
+            stonesput2 = 0
+            for s in range(0,len(player.hand.stones)):
+                st = player.hand.stones[s - stonesput2]
+                hyp = board()
+                add = list()
+                add.append(st)
+                hyp.stones = list(self.board.stones) +(list(add))
+                outcome = hyp.validate(player.thinking)
+                print(outcome)
+                if outcome == 0:
+                    player.hand.stones.remove(st)
+                    self.board.stones.append(st)
+                    stonesput += 1
+                    stonesput2 += 1
+                    print ("Stein " + st.tostr() + " gesetzt (2).")
+                else:
+                    continue
+            #SMART II (randomly)
+            stonesput3 = 0
+            tries = 5
+            while tries > 0:
+                tries -= 1
+                s1 = randint(0,len(player.hand.stones) - 1)
+                s2 = randint(0,len(player.hand.stones) - 1)
+                st1 = player.hand.stones[s1]
+                st2 = player.hand.stones[s2]
+                hyp = board()
+                add = list()
+                add.append(st1)
+                add.append(st2)
+                hyp.stones = list(self.board.stones) +(list(add))
+                outcome = hyp.validate(player.thinking)
+                print(outcome)
+                if outcome == 0:
+                    player.hand.stones.remove(st1)
+                    player.hand.stones.remove(st2)
+                    self.board.stones.append(st1)
+                    self.board.stones.append(st2)
+                    stonesput += 1
+                    stonesput3 += 1
+                    print ("Stein " + st1.tostr() + " gesetzt (3).")
+                    print ("Stein " + st2.tostr() + " gesetzt (3).")
+                else:
+                    continue
 
             
             if stonesput == 0: #draw when stuck
