@@ -269,13 +269,13 @@ class board:
         self.stones.remove(stone)
         
     def validate(self, iterations):
-        printstonearray(self.stones)
+        #printstonearray(self.stones)
         sstones = self.stones[:]
        # print("2",printstonearray(self.stones))
         self.residuum = [None] * 1000
-        print ("validation---------")
+        #print ("validation---------")
         if len(self.stones) == 0:
-            print ("validat----ZERO----e")
+            #print ("validat----ZERO----e")
             return 0
         #print ("SELF:STONES")
         #print("3",printstonearray(self.stones))
@@ -365,7 +365,7 @@ class board:
 
                 self.residuum = list()
                 self.stones = list(self.stones)
-                print ("end validat-----------SUCCESS")
+                #print ("end validat-----------SUCCESS")
                 return 0
         self.stones = sstones[:]
         
@@ -374,7 +374,7 @@ class board:
         #self.solutiontostr()
         
         #self.residuum = list()
-        print ("end validat----------OUT")
+        #print ("end validat----------OUT")
         return len(workbench.stones)
 
 class player:
@@ -391,6 +391,7 @@ class game:
         self.bank = list(allstones)
         print (len(self.bank), " stones in total.")
         self.makesturn = 0
+        self.turns = 0
 
     def printouthands(self):
         for player in self.players:
@@ -408,14 +409,16 @@ class game:
                 player.hand.stones.append(stone)
 
     def maketurn(self,playerindex):
+        self.turns += 1
         player = self.players[playerindex]
         print (">>> Turn of ", player.name)
+        print ("    #", self.turns, " - Bank: ", len(self.bank))
         #printstonearray(player.hand.stones)
        # print ("hand ende")
         #print ("BEFORE H VALI 1", len(player.hand.stones))
         player.hand.validate(player.thinking)
         #print ("AFTER H VALI 1", len(player.hand.stones))
-       # printstonearray(player.hand.stones)
+        printstonearray(player.hand.stones)
        # print(len(player.hand.solution))
         print("Groups discovered")
         player.hand.solutiontostr()
@@ -426,24 +429,24 @@ class game:
         
         if player.phaseone == True:
             if (player.hand.points() >= 30):
-                print ("KOMME JETZT RAUS")
+                #print ("makes his first active turn.")
                 player.phaseone = False
                 for g in range(0,len(player.hand.solution)):
                     ssgtones = player.hand.solution[g].stones
                     for i in range(0, len(ssgtones)):
                         ssgtone = ssgtones[i]
                         self.board.stones.append(ssgtone)
-                        print(len(self.board.stones))
+                        #print(len(self.board.stones))
                         #printstonearray(player.hand.stones)
-                        printstonearray(self.board.stones)
+                        #printstonearray(self.board.stones)
                         player.hand.stones.remove(ssgtone)
                         stonesput += 1
                 player.hand.solution = list()
-                printstonearray(self.board.stones)
+                #printstonearray(self.board.stones)
                 self.board.validate(player.thinking)
-                printstonearray(self.board.stones)
+                #printstonearray(self.board.stones)
                 player.hand.validate(player.thinking)
-                printstonearray(self.board.stones)
+                #printstonearray(self.board.stones)
                 
                # print("AFTER VALIDATE")
                 #print(len(player.hand.stones))
@@ -458,8 +461,8 @@ class game:
 #SEMISOLUTION CONCEPT PROBABLY OBSOLETE
         #print ("BEFORE ERROR")
         #player.hand.solutiontostr()
-        print ("MIDDLE")
-        printstonearray(self.board.stones)
+        #print ("MIDDLE")
+        #printstonearray(self.board.stones)
         if player.phaseone == False:
             for g in range(0,len(player.hand.solution)):
                 ssgdtones = player.hand.solution[g].stones
@@ -485,6 +488,7 @@ class game:
                         player.hand.stones.remove(scan)
                         self.board.stones.append(scan)
                         stonesput += 1
+                        print ("Stein " + scan.tostr() + " gesetzt.")
                         #print(len(self.board.stones))
                     else:
                         ngroup.stones.remove(scan)
