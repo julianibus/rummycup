@@ -464,6 +464,8 @@ class game:
         #print ("MIDDLE")
         #printstonearray(self.board.stones)
         if player.phaseone == False:
+
+            #PUT GROUPS
             for g in range(0,len(player.hand.solution)):
                 ssgdtones = player.hand.solution[g].stones
                 for i in range(0, len(ssgdtones)):
@@ -478,6 +480,8 @@ class game:
             #self.board.validate()
             self.board.validate(player.thinking)
             player.hand.validate(player.thinking)
+
+            #ADD SINGLE STONES TO EXISTING GROUPS
             for g in self.board.solution:
                 spos = g.getpossibilities()
                 cans = list(set(spos) & set(player.hand.stones))
@@ -492,8 +496,13 @@ class game:
                         #print(len(self.board.stones))
                     else:
                         ngroup.stones.remove(scan)
-                        continue     
+                        continue
 
+            #SMART
+            for g in range(0,len(player.hand.solution)):
+                ssgtones = player.hand.solution[g].stones
+
+            
             if stonesput == 0: #draw when stuck
                 index = randint(0, len(self.bank) - 1)
                 draw = self.bank[index]
